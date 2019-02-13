@@ -1,5 +1,5 @@
 #include <Adafruit_NeoPixel.h>
-#include <sbrk.h> //For use with XMC1.
+//#include <sbrk.h> //For use with XMC1.
 
 #define BRed        2         // Digital IO pin connected to the button.  This will be
 #define BBlue       3         // driven with a pull-up resistor so the switch should
@@ -21,8 +21,15 @@ int       level = 5;        //Lenght of the secuence.
 const int LEVEL_MAX = 50;   //Max lenght of the secuence.
 int       list[LEVEL_MAX];  //Secuence.
 bool      GameOver = false; 
-int       cont = 1;         //Position in the secuence.
+int       cont = 0;         //Position in the secuence.
 int       sp;               //Led speed show.
+
+extern "C" void *_sbrk(int incr);
+void dummy_sbrk_caller() __attribute__((__used__));
+void dummy_sbrk_caller()
+{
+  _sbrk(0);
+} 
 
 void setup() {
   pinMode(BRed,     INPUT_PULLUP);
@@ -48,16 +55,16 @@ void game(){
   while (GameOver == false){
     if (cont == level){
       startShow(5); //Win
-      cont = 1;
+      cont = 0;
       GameOver = true;
     }
     
     else {
       showRandList(cont);
-      state();
-      for (int i = 0 ; i < cont ; i++){
+      //state();
+      for (int i = 0 ; i <= cont ; i++){
+        state();
         if (s == list[i]){
-          state();
           delay(100);
         }
         else{
